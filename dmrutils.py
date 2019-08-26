@@ -8,14 +8,14 @@ from datetime import datetime
 
 """
 DMRUtils - A collection of methods good for manipulating 
-             and processing a DMR ID files.
+           and processing a DMR ID files.
              
-             This base class accepts the user.csv file
-             downloaded from https://radioid.net/database/dumps#!
-             and converts the file to the format required to
-             import into the Anytone 868 and 878 handhelds.
+           This base class accepts the user.csv file
+           downloaded from https://radioid.net/database/dumps#!
+           and converts the file to the format required to
+           import into the Anytone 868 and 878 handhelds.
 """
-DMRUTILS_VERS = '0.0.2'
+DMRUTILS_VERS = '1.0.0'
 ANYTONE878fieldnames = ['No.','Radio ID', \
                         'Callsign', 'Name', \
                         'City', 'State', \
@@ -86,8 +86,6 @@ class DMRUtils():
         
     def dmrMain(self, filename):
         filestuff = os.path.splitext(filename)
-        #timenow = datetime.now()
-        #datestg = timenow.strftime('%Y%m%d-%H%M%S')
         datestg = datetime.now().strftime('%Y%m%d-%H%M%S')
         data = self.readFile(filename)
  
