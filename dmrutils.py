@@ -15,7 +15,7 @@ DMRUtils - A collection of methods good for manipulating
            and converts the file to the format required to
            import into the Anytone 868 and 878 handhelds.
 """
-DMRUTILS_VERS = '1.0.0'
+DMRUTILS_VERS = '1.0.1'
 ANYTONE878fieldnames = ['No.','Radio ID', \
                         'Callsign', 'Name', \
                         'City', 'State', \
@@ -93,8 +93,8 @@ class DMRUtils():
           
         self.writeFile(new_data, \
                        filestuff[0] + '-AnyTone-' + \
-                          datestg \
-                          + '.csv', \
+                                       datestg  + \
+                                      '.csv', \
                        ANYTONE878fieldnames)
 
 """

@@ -10,10 +10,10 @@ Converts RADIOID.NET user.csv file to format required
 by the Connect Systems CS-800D.
 """
 
-CS800D_VERS = '0.0.1'
+CS800D_VERS = '0.0.2'
 CS800Dfieldnames = ['No','Call Alias', \
                          'Call Type', \
-			 'Call ID', \
+			             'Call ID', \
                          'Receive Tone']
 
 class CS800D(DMRUtils):
