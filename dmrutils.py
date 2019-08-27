@@ -10,12 +10,12 @@ from datetime import datetime
 DMRUtils - A collection of methods good for manipulating 
            and processing a DMR ID files.
              
-           This base class accepts the user.csv file
+           This base / parent class accepts the user.csv file
            downloaded from https://radioid.net/database/dumps#!
            and converts the file to the format required to
            import into the Anytone 868 and 878 handhelds.
 """
-DMRUTILS_VERS = '1.0.1'
+DMRUTILS_VERS = '1.0.4'
 ANYTONE878fieldnames = ['No.','Radio ID', \
                         'Callsign', 'Name', \
                         'City', 'State', \
@@ -26,12 +26,13 @@ ANYTONE878fieldnames = ['No.','Radio ID', \
 class DMRUtils():
 
     def __init__(self, filename = None):
+        self.VERSION = DMRUTILS_VERS
         if (filename):
             self.dmrMain(filename)
         pass
 
     def __version__(self):
-        return DMRUTILS_VERS
+        return self.VERSION
         
         
     def readFile(self, filename):
@@ -103,12 +104,20 @@ This may need to be modified for each individual type.
 """
 class get_args():
     def __init__(self):
-        if __name__ == '__main__':
-            self.args = self.getargs()
+        self.args = self.getargs()
+
+    def __get_app_version__(self):
+        TEMP = DMRUtils()
+        return TEMP.__version__()
             
     def getargs(self):
-        parser = argparse.ArgumentParser()
-        parser.add_argument('-v', '--version', action='version', version = DMRUTILS_VERS)
+        version = self.__get_app_version__()
+        parser = argparse.ArgumentParser(
+            description = 'Convert RADIOID.NET user.csv file to ' + \
+                          'Anytone AT-8x8 UV Format.',
+            epilog = 'This class is normally inherited by another '+ \
+                     'for a specific radio or family of radios.')
+        parser.add_argument('-v', '--version', action='version', version = version)
         parser.add_argument("-i", "--inputpath", default=None,
             help="Specifies the path to the DMR ID file in .csv format.")
         return parser.parse_args()
@@ -119,4 +128,4 @@ Main program - run stand-alone if not included as part of a larger application
 """
 if __name__ == '__main__':
    args = get_args()
-   testapp = DMRUtils(args.args.inputpath.strip())
+   app = DMRUtils(args.args.inputpath.strip())
