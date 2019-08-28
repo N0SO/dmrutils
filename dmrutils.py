@@ -103,8 +103,7 @@ This may need to be modified for each individual type.
 """
 class get_args():
     def __init__(self):
-        if __name__ == '__main__':
-            self.args = self.getargs()
+        self.args = self.getargs()
             
     def getargs(self):
         parser = argparse.ArgumentParser()

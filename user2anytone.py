@@ -9,7 +9,7 @@ by the Anytone 868/878 Handheld radios.
 """
 
 
-class AT8x8U(DMRUtils):
+class Usr2Anytone(DMRUtils):
     """
     Base class includes Anytone 868/878 support
     """
@@ -38,6 +38,6 @@ Main program - run stand-alone if not included as part of a larger application
 """
 if __name__ == '__main__':
    args = get_args()
-   testapp = AT8x8U(args.args.inputpath.strip())
+   testapp = User2Anytone(args.args.inputpath.strip())
    
     
