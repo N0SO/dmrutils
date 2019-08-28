@@ -15,7 +15,7 @@ DMRUtils - A collection of methods good for manipulating
            and converts the file to the format required to
            import into the Anytone 868 and 878 handhelds.
 """
-DMRUTILS_VERS = '1.0.4'
+DMRUTILS_VERS = '1.0.5'
 ANYTONE878fieldnames = ['No.','Radio ID', \
                         'Callsign', 'Name', \
                         'City', 'State', \
@@ -105,13 +105,10 @@ This may need to be modified for each individual type.
 class get_args():
     def __init__(self):
         self.args = self.getargs()
-<<<<<<< HEAD
-=======
 
     def __get_app_version__(self):
         TEMP = DMRUtils()
         return TEMP.__version__()
->>>>>>> 568b86de537ef2f1317e2129d683506192c3b630
             
     def getargs(self):
         version = self.__get_app_version__()
