@@ -13,8 +13,8 @@ Converts RADIOID.NET user.csv file to format required
 by the Connect Systems CS-800D.
 """
 
-CS800D_VERS = '1.0.0'
-
+CS800D_VERS = '1.0.1'
+RADIOTYPE = 'CS800D'
 CS800Dfieldnames = ['No','Call Alias', \
                          'Call Type', \
 			             'Call ID', \
@@ -23,6 +23,8 @@ CS800Dfieldnames = ['No','Call Alias', \
 class User2CS800D(DMRUtils):
     def __init__(self, filename = None):
         self.VERSION = CS800D_VERS
+        self.RADIOTYPE = RADIOTYPE
+        self.FIELDNAMES = CS800Dfieldnames
         if (filename):
             self.dmrMain(filename)
         pass
@@ -46,26 +48,8 @@ class User2CS800D(DMRUtils):
                        'Receive Tone': 'No'})
             target_data.append(newline)
             linecount += 1
-        return target_data    
-        
-    def dmrMain(self, filename):
-        """
-	    Overloads and replaces the same
-	    named method in Parent class
-	    DMRUtils
-	    """
-        filestuff = os.path.splitext(filename)
-        datestg = datetime.now().strftime('%Y%m%d-%H%M%S')
-        data = self.readFile(filename)
- 
-        new_data = self.processData(data)
-          
-        self.writeFile(new_data, \
-                       filestuff[0] + '-CS800D-' + \
-                          datestg \
-                          + '.csv', \
-                       CS800Dfieldnames)
-
+        return target_data
+    
 """
 Aurgument Parser Class
 This may need to be modified for each individual type.

@@ -10,6 +10,7 @@ by the Anytone 868/878 Handheld radios.
 """
 class User2Anytone(DMRUtils):
     def __init__(self, filename = None):
+        DMRUtils.__init__(self)
         self.VERSION = ANYTONE_VERS
         if (filename):
             self.dmrMain(filename)

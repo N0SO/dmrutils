@@ -15,7 +15,8 @@ DMRUtils - A collection of methods good for manipulating
            and converts the file to the format required to
            import into the Anytone 868 and 878 handhelds.
 """
-DMRUTILS_VERS = '1.0.5'
+DMRUTILS_VERS = '1.0.6'
+RADIOTYPE = 'AnyTone'
 ANYTONE878fieldnames = ['No.','Radio ID', \
                         'Callsign', 'Name', \
                         'City', 'State', \
@@ -27,6 +28,8 @@ class DMRUtils():
 
     def __init__(self, filename = None):
         self.VERSION = DMRUTILS_VERS
+        self.RADIOTYPE = RADIOTYPE
+        self.FIELDNAMES = ANYTONE878fieldnames
         if (filename):
             self.dmrMain(filename)
         pass
@@ -52,12 +55,22 @@ class DMRUtils():
                ret_data.append(item)
         return ret_data
 
-    def writeFile(self, data, filename, fieldnames):
+    def writeFile(self, data, filename):
         with open(filename, 'wb') as new_file:
-            csv_writer = csv.DictWriter(new_file, fieldnames)
+            csv_writer = csv.DictWriter(new_file,
+                                        self.FIELDNAMES)
             csv_writer.writeheader()
             for line in data:
                 csv_writer.writerow(line)
+
+    def autowriteFile(self, new_data, filename):
+        filestuff = os.path.splitext(filename)
+        datestg = datetime.now().strftime('%Y%m%d-%H%M%S')
+        newfilepath = filestuff[0] + '-' + self.RADIOTYPE + \
+                                           '-' + datestg  + \
+                                           '.csv'
+        self.writeFile(new_data, newfilepath)
+        return newfilepath
                 
     def findTag(self, data, key, value):
         retval = None
@@ -86,17 +99,14 @@ class DMRUtils():
         return target_data    
         
     def dmrMain(self, filename):
-        filestuff = os.path.splitext(filename)
-        datestg = datetime.now().strftime('%Y%m%d-%H%M%S')
         data = self.readFile(filename)
  
         new_data = self.processData(data)
+
+        resultfile = self.autowriteFile(new_data, filename)
+                                        
+                                        
           
-        self.writeFile(new_data, \
-                       filestuff[0] + '-AnyTone-' + \
-                                       datestg  + \
-                                      '.csv', \
-                       ANYTONE878fieldnames)
 
 """
 Aurgument Parser Class
