@@ -5,6 +5,10 @@ gui_dmrutils.py - GUI "front end" for DMR utilities
           V0.0.1 - 2019-08-28
           First interation
           
+          V0.1.0 - 2019-08-29
+          Fuctional enough for first use! Converts to 
+          AnyTone 868/878 and Connect Systems CS-800D
+          
 """
 from Tkinter import *
 from tkMessageBox import *
@@ -16,7 +20,7 @@ from user2cs800d import User2CS800D
 import os.path
 import argparse
 
-VERSION = '0.0.2'
+VERSION = '0.1.0'
 FILELIST = './'
 RADIOIDURL = 'https://radioid.net/static/user.csv'
 
@@ -79,11 +83,12 @@ class guiDMRUtils(Frame):
                                       filetypes=[("CSV files","*.csv"),
                                                  ("Text files","*.txt"),
                                                  ("All Files","*.*")])
-        print('File name selected: %s'%(fileName))
-        dmrapp = User2Anytone()
-        self.usercsvData = dmrapp.readFile(fileName)
-        self.fillLogTextfromFile(fileName, self.LogText)
-        self.userfilename = fileName
+        if os.path.isfile(fileName):
+            print('File name selected: %s'%(fileName))
+            dmrapp = User2Anytone()
+            self.usercsvData = dmrapp.readFile(fileName)
+            self.fillLogTextfromFile(fileName, self.LogText)
+            self.userfilename = fileName
 
     def AnyTonecsv(self):
         print ('Convert to AnyTone AT-8x8UV format...')
@@ -105,6 +110,24 @@ class guiDMRUtils(Frame):
         
     def CS800Dcsv(self):
         print ('Convert to Connect Systems CS-800D format...')
+        if (self.userfilename):
+            dmrapp=User2CS800D()
+            new_data = dmrapp.processData(self.usercsvData)
+            resultfile = dmrapp.autowriteFile(new_data,
+                                          self.userfilename)
+            self.LogText.delete(1.0, END)
+            self.fillLogTextfromFile(resultfile, self.LogText)
+            showinfo('Connect Systems CS800D Conversion Complete', \
+                 'After adding your Talk Groups with a text ' + \
+                 'editor or spreadsheet program, ' + \
+                 'Import this file into your CPS:\n'+ \
+                  resultfile)
+            print resultfile
+        else:
+            print ('Fetch or browse or a user.csv file first!')
+            showinfo('File conversion error!', \
+                     'Fetch or browse or a user.csv file first!')
+       
 
     def About(self):
         showinfo('GUI_DMRUTILS', 'GUI_DMRUTILS - Version ' + VERSION + '\n' + \
@@ -115,56 +138,6 @@ class guiDMRUtils(Frame):
                  'Convert user.csv file to the format required\n'+ \
                  'by the AnyTone AT-868UV and AT-878UV.')
 
-    def SumOneXOnes(self):
-        logpathName = askdirectory()
-        print('Directory name selected: %s'%logpathName)
-        sumApp = MOQPCategory()
-        sumData = sumApp.exportcsvflist(logpathName)
-        sumLines = sumData.split('\n')
-        for line in sumLines:
-           self.LogText.insert(END, line.strip()+'\n')
-        sumfile = logpathName + "logsummaryreport.txt"
-        with open(sumfile,'w') as f:
-           f.write(sumData)
-        showinfo('CSV summary File created and saved', 'Saved as file:\n%s'%sumfile)
-
-    def SumDir(self):
-        logpathName = askdirectory()
-        print('Directory name selected: %s'%logpathName)
-        sumApp = MOQPCategory()
-        sumData = sumApp.exportcsvflist(logpathName)
-        sumLines = sumData.split('\n')
-        for line in sumLines:
-           self.LogText.insert(END, line.strip()+'\n')
-        sumfile = logpathName + "logsummaryreport.txt"
-        with open(sumfile,'w') as f:
-           f.write(sumData)
-        showinfo('CSV summary File created and saved', 'Saved as file:\n%s'%sumfile)
-        
-        
-        
-
-    def SumFile(self):
-        logfileName = askopenfilename(title = "Select input log file:",
-                                      filetypes=[("LOG files","*.log"),
-                                                 ("CSV files","*.csv"),
-                                                 ("Text files","*.txt"),
-                                                 ("All Files","*.*")])
-        print('File name selected: %s'%(logfileName))
-        
-        logdata = self.fillLogTextfromFile(logfileName, self.LogText)
-        
-        sumApp = MOQPCategory()
-        sumData = sumApp.exportcsvfile(logfileName)
-        sumLines = sumData.split('\n')
-        for line in sumLines:
-           self.LogText.insert(END, line.strip()+'\n')
-        sumfile = logfileName + ".txt"
-        with open(sumfile,'w') as f:
-           f.write(sumData)
-        showinfo('CSV summary File created and saved', 'Saved as file:\n%s'%sumfile)
-        
-        
         
     def fillLogTextfromFile(self, filename, textWindow):
         try: 
@@ -176,25 +149,6 @@ class guiDMRUtils(Frame):
            retText = ('Could not read file: '%(fName))
         return retText
 
-    def OpenFile(self):
-        csvfilename = askopenfilename(title = "Select input ID file:",
-                                      filetypes=[("CSV files","*.csv"),
-                                                 ("Text files","*.txt"),
-                                                 ("All Files","*.*")])
-        print('File name selected: %s'%(csvfilename))
-        if os.path.isfile(csvfilename):
-            csvtext = self.fillLogTextfromFile(csvfilename, self.LogText)
-            app = csv2CAB()
-            cabtext = r""
-            cabtext = app.processcsvData(csvtext)
-            #print csvtext
-            for line in cabtext:
-               self.LogText.insert(END, line.strip()+'\n')
-            cabfile = csvfilename + ".log"
-            with open(cabfile,'w') as f:
-                f.write(cabtext)
-            showinfo('CAB File created and saved', 'Saved as CAB file:\n'+cabfile)
-            
     def FetchFile(self, URL=None, pathname=None):
        """
        Fetch latest user.csv file from RADIO ID.NET
