@@ -10,17 +10,22 @@ gui_dmrutils.py - GUI "front end" for DMR utilities
           AnyTone 868/878 and Connect Systems CS-800D
           
 """
-from Tkinter import *
+try:
+    from Tkinter import *
+except ImportError:
+    from tkinter import *
 from tkMessageBox import *
 from tkFileDialog   import askopenfilename
 from tkFileDialog   import askdirectory
+from tkFileDialog   import asksaveasfilename
+from datetime import datetime
 from user2anytone import User2Anytone
 from user2cs800d import User2CS800D
 
 import os.path
 import argparse
 
-VERSION = '0.1.0'
+VERSION = '1.0.0'
 FILELIST = './'
 RADIOIDURL = 'https://radioid.net/static/user.csv'
 
@@ -154,6 +159,31 @@ class guiDMRUtils(Frame):
        Fetch latest user.csv file from RADIO ID.NET
        """
        print('Fetching latest user.csv file from %s'%(RADIOIDURL))
+       app = User2Anytone()
+       self.usercsvData = app.fetchIDList('www.radioid.net',
+                                     '/static/user.csv')         
+       if (self.usercsvData):
+           self.userfilename = 'user.csv'
+           datestg = datetime.now().strftime('%Y%m%d-%H%M%S')
+           newfilename = 'user-' + datestg  +'.csv'
+           self.LogText.delete(1.0, END)
+           for line in self.usercsvData:
+               self.LogText.insert(END, line)
+           
+	   filename = asksaveasfilename(initialdir = "./",
+	                  title = "Save user.csv file...",
+			  initialfile = newfilename,
+			  filetypes = [("csv files","*.csv"),
+			               ("text files","*.txt"),
+			               ("all files","*.*")])
+	   name = open(filename, 'wb')
+           name.write(self.usercsvData)
+           name.close()
+           self.userfilename = os.path.dirname(filename) + \
+	                        '/user.csv'
+	   self.usercsvData = None
+	   self.usercsvData = app.readFile(filename) 
+	   print (self.usercsvData)
        pass
         
     def appMain(self, pathname):

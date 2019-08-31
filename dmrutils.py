@@ -1,9 +1,9 @@
 #!/bin/python
 from sys import stdin, stdout
 import csv
-import pprint
 import os
 import argparse
+import httplib, traceback
 from datetime import datetime
 
 """
@@ -15,7 +15,7 @@ DMRUtils - A collection of methods good for manipulating
            and converts the file to the format required to
            import into the Anytone 868 and 878 handhelds.
 """
-DMRUTILS_VERS = '1.0.6'
+DMRUTILS_VERS = '1.0.7'
 RADIOTYPE = 'AnyTone'
 ANYTONE878fieldnames = ['No.','Radio ID', \
                         'Callsign', 'Name', \
@@ -78,6 +78,25 @@ class DMRUtils():
             if( data_item.get(key == value) ):
                 retval = data_item
         return retval
+	
+    def fetchIDList(self, urlbase, urlpath):
+        retdata = None
+	try:
+            conn = httplib.HTTPSConnection(urlbase)
+            conn.request("GET", urlpath)
+            r1 = conn.getresponse()
+            print("get status: %d -- %s"%(r1.status, r1.reason))
+	    print("reading data...")
+            retdata = r1.read()
+	    conn.close()
+	    print("... done!")
+        except:
+	    tb = traceback.format_exc()
+	    print("Error fetching %s%s"%(urlbase, urlpath))
+	    print("traceback:\n%s"%(tb))
+	return retdata
+ 
+
 
     def processData(self, source_data):
         target_data = []
