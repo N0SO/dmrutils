@@ -65,7 +65,7 @@ class guiDMRUtils(Frame):
 
     #Creation of init_window
     def client_exit(self):
-        print "Exiting..."
+        print( "Exiting..." )
         exit()
 
     def init_window(self):
@@ -110,7 +110,7 @@ class guiDMRUtils(Frame):
         #mainloop()
 
     def BrowseFile(self):
-        print "Browse for previously downloaded user.csv file!"
+        print( "Browse for previously downloaded user.csv file!")
         fileName = askopenfilename(title = "Select user.csv:",
                                       filetypes=[("CSV files","*.csv"),
                                                  ("Text files","*.txt"),
@@ -137,7 +137,7 @@ class guiDMRUtils(Frame):
             showinfo('AnyTone AT-868/878UV Conversion Complete', \
                  'Import this file into your AnyTone CPS:\n'+ \
                   resultfile)
-            print resultfile
+            print( resultfile )
         else:
             print ('Fetch or browse or a user.csv file first!')
             showinfo('File conversion error!', \
@@ -157,7 +157,7 @@ class guiDMRUtils(Frame):
                  'editor or spreadsheet program, ' + \
                  'Import this file into your CPS:\n'+ \
                   resultfile)
-            print resultfile
+            print( resultfile )
         else:
             print ('Fetch or browse or a user.csv file first!')
             showinfo('File conversion error!', \

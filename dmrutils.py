@@ -1,10 +1,15 @@
 #!/bin/python
 from sys import stdin, stdout
 import csv
-import os
+import os, sys
 import argparse
-import httplib, traceback
+import traceback
 from datetime import datetime
+python_version = sys.version_info[0]
+if (python_version == 2):
+    import httplib
+else:
+    import http.client as httplib
 
 """
 DMRUtils - A collection of methods good for manipulating 
@@ -81,20 +86,20 @@ class DMRUtils():
 	
     def fetchIDList(self, urlbase, urlpath):
         retdata = None
-	try:
+        try:
             conn = httplib.HTTPSConnection(urlbase)
             conn.request("GET", urlpath)
             r1 = conn.getresponse()
             print("get status: %d -- %s"%(r1.status, r1.reason))
-	    print("reading data...")
+            print("reading data...")
             retdata = r1.read()
-	    conn.close()
-	    print("... done!")
+            conn.close()
+            print("... done!")
         except:
-	    tb = traceback.format_exc()
-	    print("Error fetching %s%s"%(urlbase, urlpath))
-	    print("traceback:\n%s"%(tb))
-	return retdata
+            tb = traceback.format_exc()
+            print("Error fetching %s%s"%(urlbase, urlpath))
+            print("traceback:\n%s"%(tb))
+        return retdata
  
 
 
