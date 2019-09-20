@@ -48,20 +48,8 @@ RADIOIDURL = 'https://radioid.net/static/user.csv'
 class guiDMRUtils(Frame):
 
     # Define settings upon initialization. Here you can specify
-    def __init__(self, master=None):
-        
-        # parameters that you want to send through the Frame class. 
-        Frame.__init__(self, master)   
-
-        #reference to the master widget, which is the tk window                 
-        self.master = master
-
-        #with that, we want to then run init_window, which doesn't yet exist
-        self.init_window()
-
-        self.usercsvData = None
-
-        self.userfilename = None
+    def __init__(self):
+        self.appMain()        
 
     #Creation of init_window
     def client_exit(self):
@@ -226,24 +214,22 @@ class guiDMRUtils(Frame):
            self.filemenu.entryconfigure("Convert to CS800D...", state="normal")
        pass
         
-    def appMain(self, pathname):
-       #import moqpcategory
-       mqpcat = MOQPCategory()
-       
-       if (os.path.isfile(pathname)):
-          mqpcat.exportcsvfile(pathname.strip())
-       else:
-          mqpcat.exportcsvflist(pathname.strip())
+    def appMain(self):
+        # parameters that you want to send through the Frame class. 
+        self.master = Tk()
+
+        Frame.__init__(self, self.master)   
+
+        #with that, we want to then run init_window, which doesn't yet exist
+        self.init_window()
+
+        self.usercsvData = None
+
+        self.userfilename = None
+
+        self.master.mainloop()
         
 if __name__ == '__main__':
-      root = Tk()
-
-      root.geometry("900x300")
 
       #creation of an instance
-      app = guiDMRUtils(root)
-
-      #mainloop 
-      root.mainloop()     
-   
-        
+      app = guiDMRUtils()
