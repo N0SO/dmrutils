@@ -54,14 +54,14 @@ class DMRUtils():
             portion of each pair.
         """
         ret_data =[]
-        with open(filename, 'rb') as csv_file:
+        with open(filename, 'r') as csv_file:
             csv_data = csv.DictReader(csv_file)
             for item in csv_data:
                ret_data.append(item)
         return ret_data
 
     def writeFile(self, data, filename):
-        with open(filename, 'wb') as new_file:
+        with open(filename, 'w') as new_file:
             csv_writer = csv.DictWriter(new_file,
                                         self.FIELDNAMES)
             csv_writer.writeheader()
@@ -95,6 +95,7 @@ class DMRUtils():
             retdata = r1.read()
             conn.close()
             print("... done!")
+            print("fetched data:\n%s"%(retdata))
         except:
             tb = traceback.format_exc()
             print("Error fetching %s%s"%(urlbase, urlpath))
