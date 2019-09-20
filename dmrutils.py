@@ -1,12 +1,15 @@
 #!/bin/python
 from sys import stdin, stdout
 import csv
-import os
+import os, sys
 import argparse
-#import httplib
-import http.client
 import traceback
 from datetime import datetime
+python_version = sys.version_info[0]
+if (python_version == 2):
+    import httplib
+else:
+    import http.client as httplib
 
 """
 DMRUtils - A collection of methods good for manipulating 

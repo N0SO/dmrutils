@@ -1,14 +1,29 @@
 #!/usr/bin/python
 """
 gui_dmrutils.py - GUI "front end" for DMR utilities
+Update History:
 
-          V0.0.1 - 2019-08-28
-          First interation
-          
-          V0.1.0 - 2019-08-29
-          Fuctional enough for first use! Converts to 
-          AnyTone 868/878 and Connect Systems CS-800D
-          
+* Wed Aug 29 2019 Mike Heitmann, N0SO <n0so@arrl.net>
+- V0.0.1 - First iteration
+* Thu Aug 29 2019 Mike Heitmann, N0SO <n0so@arrl.net>
+- V0.1.0 - Fuctional enough for first use! Converts to 
+- AnyTone 868/878 and Connect Systems CS-800D
+
+"""
+import sys
+python_version = sys.version_info[0]
+if (python_version == 2):
+    from Tkinter import *
+    from tkMessageBox import *
+    from tkFileDialog   import askopenfilename
+    from tkFileDialog   import askdirectory
+    from tkFileDialog   import asksaveasfilename
+else:
+    from tkinter import *
+    from tkinter.messagebox import showinfo
+    from tkinter.filedialog import askopenfilename
+    from tkinter.filedialog import askdirectory
+    from tkinter.filedialog import asksaveasfilename
 """
 try:
     from Tkinter import *
@@ -18,6 +33,7 @@ from tkMessageBox import *
 from tkFileDialog   import askopenfilename
 from tkFileDialog   import askdirectory
 from tkFileDialog   import asksaveasfilename
+"""
 from datetime import datetime
 from user2anytone import User2Anytone
 from user2cs800d import User2CS800D
@@ -25,7 +41,7 @@ from user2cs800d import User2CS800D
 import os.path
 import argparse
 
-VERSION = '1.0.0'
+VERSION = '1.0.1'
 FILELIST = './'
 RADIOIDURL = 'https://radioid.net/static/user.csv'
 
@@ -66,13 +82,24 @@ class guiDMRUtils(Frame):
         root.config(menu=menu)
         self.filemenu = Menu(menu)
         menu.add_cascade(label="File", menu=self.filemenu)
-        self.filemenu.add_command(label="Browse for ID List File...", command=self.BrowseFile)
-        self.filemenu.add_command(label="Fetch Latest ID List...", command=self.FetchFile)
+        self.filemenu.add_command(\
+                    label="Browse for ID List File...", 
+                    command=self.BrowseFile)
+        self.filemenu.add_command(\
+                    label="Fetch Latest ID List...", 
+                    command=self.FetchFile)
         self.filemenu.add_separator()
-        self.filemenu.add_command(label="Convert to AnyTone...", command=self.AnyTonecsv)
-        self.filemenu.add_command(label="Convert to CS800D...", command=self.CS800Dcsv)
+        self.filemenu.add_command( \
+                    label="Convert to AnyTone...", 
+                    command=self.AnyTonecsv, 
+                    state="disabled")
+        self.filemenu.add_command( \
+                    label="Convert to CS800D...", 
+                    command=self.CS800Dcsv, 
+                    state="disabled")
         self.filemenu.add_separator()
-        self.filemenu.add_command(label="Exit", command=self.client_exit)
+        self.filemenu.add_command(label="Exit", 
+                                  command=self.client_exit)
 
         helpmenu = Menu(menu)
         menu.add_cascade(label="Help", menu=helpmenu)
@@ -94,6 +121,9 @@ class guiDMRUtils(Frame):
             self.usercsvData = dmrapp.readFile(fileName)
             self.fillLogTextfromFile(fileName, self.LogText)
             self.userfilename = fileName
+            self.filemenu.entryconfigure("Convert to AnyTone...", state="normal")
+            self.filemenu.entryconfigure("Convert to CS800D...", state="normal")
+
 
     def AnyTonecsv(self):
         print ('Convert to AnyTone AT-8x8UV format...')
@@ -144,12 +174,19 @@ class guiDMRUtils(Frame):
                  'by the AnyTone AT-868UV and AT-878UV.')
 
         
-    def fillLogTextfromFile(self, filename, textWindow):
+    def fillLogTextfromData(self, Data, textWindow, clearWin = False):
+        if (clearWin):
+            textWindow.delete(1.0, END)
+        for line in Data:
+            textWindow.insert(END, line.strip()+'\n')
+
+    def fillLogTextfromFile(self, filename, textWindow, clearWin = False):
+        if (clearWin):
+            textWindow.delete(1.0, END)
         try: 
            with open(filename,'r') as f:
               retText = f.readlines()
-           for line in retText:
-              textWindow.insert(END, line.strip()+'\n')
+           self.fillLogTextfromData(retText, textWindow, clearWin)
         except IOError:
            retText = ('Could not read file: '%(fName))
         return retText
@@ -169,21 +206,24 @@ class guiDMRUtils(Frame):
            self.LogText.delete(1.0, END)
            for line in self.usercsvData:
                self.LogText.insert(END, line)
+
            
            filename = asksaveasfilename(initialdir = "./",
-	                  title = "Save user.csv file...",
-			  initialfile = newfilename,
-			  filetypes = [("csv files","*.csv"),
-			               ("text files","*.txt"),
-			               ("all files","*.*")])
+                      title = "Save user.csv file...",
+                      initialfile = newfilename,
+                      filetypes = [("csv files","*.csv"),
+                                   ("text files","*.txt"),
+                                   ("all files","*.*")])
            name = open(filename, 'wb')
            name.write(self.usercsvData)
            name.close()
            self.userfilename = os.path.dirname(filename) + \
-	                        '/user.csv'
+                                '/user.csv'
            self.usercsvData = None
            self.usercsvData = app.readFile(filename) 
            print (self.usercsvData)
+           self.filemenu.entryconfigure("Convert to AnyTone...", state="normal")
+           self.filemenu.entryconfigure("Convert to CS800D...", state="normal")
        pass
         
     def appMain(self, pathname):
