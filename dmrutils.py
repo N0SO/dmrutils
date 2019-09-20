@@ -3,7 +3,9 @@ from sys import stdin, stdout
 import csv
 import os
 import argparse
-import httplib, traceback
+#import httplib
+import http.client
+import traceback
 from datetime import datetime
 
 """
@@ -81,20 +83,20 @@ class DMRUtils():
 	
     def fetchIDList(self, urlbase, urlpath):
         retdata = None
-	try:
+        try:
             conn = httplib.HTTPSConnection(urlbase)
             conn.request("GET", urlpath)
             r1 = conn.getresponse()
             print("get status: %d -- %s"%(r1.status, r1.reason))
-	    print("reading data...")
+            print("reading data...")
             retdata = r1.read()
-	    conn.close()
-	    print("... done!")
+            conn.close()
+            print("... done!")
         except:
-	    tb = traceback.format_exc()
-	    print("Error fetching %s%s"%(urlbase, urlpath))
-	    print("traceback:\n%s"%(tb))
-	return retdata
+            tb = traceback.format_exc()
+            print("Error fetching %s%s"%(urlbase, urlpath))
+            print("traceback:\n%s"%(tb))
+        return retdata
  
 
 
