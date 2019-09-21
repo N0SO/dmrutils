@@ -6,9 +6,11 @@ import traceback
 from datetime import datetime
 python_version = sys.version_info[0]
 if (python_version == 2):
-    import httplib
+    #import httplib
+    import requests
 else:
-    import http.client as httplib
+    #import http.client as httplib
+    import requests
 
 """
 DMRUtils - A collection of methods good for manipulating 
@@ -83,26 +85,28 @@ class DMRUtils():
                 retval = data_item
         return retval
 	
-    def fetchIDList(self, urlbase, urlpath):
-        retdata = None
+    def fetchIDList(self, url):
+        retdata = []
+        rawdata = None
         try:
-            conn = httplib.HTTPSConnection(urlbase)
-            conn.request("GET", urlpath)
-            r1 = conn.getresponse()
-            print("get status: %d -- %s"%(r1.status, r1.reason))
-            print("reading data...")
-            retdata = r1.read()
-            conn.close()
+            print("reading data from %s..."%(url))
+            r1 = requests.get(url) 
+            print ("URL read status: %d"%(r1.status_code))
+            rawdata = r1.text
             print("... done!")
-            print("fetched data:\n%s"%(retdata))
         except:
             tb = traceback.format_exc()
-            print("Error fetching %s%s"%(urlbase, urlpath))
+            print("Error fetching %s"%(url))
             print("traceback:\n%s"%(tb))
+        linestg = rawdata.splitlines()
+        for line in linestg:
+            nextline = []
+            lineparts = line.split(',')
+            for nextpart in lineparts:
+                nextline.append(nextpart)
+            retdata.append(nextline)
         return retdata
  
-
-
     def processData(self, source_data):
         target_data = []
         linecount = 1

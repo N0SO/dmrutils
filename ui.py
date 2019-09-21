@@ -39,11 +39,10 @@ from user2anytone import User2Anytone
 from user2cs800d import User2CS800D
 
 import os.path
-import argparse
 
 VERSION = '1.0.1'
 FILELIST = './'
-RADIOIDURL = 'https://radioid.net/static/user.csv'
+RADIOIDURL = 'https://www.radioid.net/static/user.csv'
 
 class guiDMRUtils(Frame):
 
@@ -190,22 +189,33 @@ class guiDMRUtils(Frame):
            retText = ('Could not read file: '%(fName))
         return retText
 
-    def FetchFile(self, URL=None, pathname=None):
+    def FetchFile(self, URL=RADIOIDURL):
        """
-       Fetch latest user.csv file from RADIO ID.NET
+       Fetch latest user.csv file from URL
        """
-       print('Fetching latest user.csv file from %s'%(RADIOIDURL))
+       print('Fetching latest user.csv file from %s'%(URL))
        app = User2Anytone()
-       self.usercsvData = app.fetchIDList('www.radioid.net',
-                                     '/static/user.csv')         
+       self.usercsvData = app.fetchIDList(URL)
+       #print('Fetched data = \n%s'%(self.usercsvData))         
        if (self.usercsvData):
            self.userfilename = 'user.csv'
            datestg = datetime.now().strftime('%Y%m%d-%H%M%S')
            newfilename = 'user-' + datestg  +'.csv'
            self.LogText.delete(1.0, END)
+           
+           fileData = ''
            for line in self.usercsvData:
-               self.LogText.insert(END, line)
-
+               #linestg = ''
+               first = True
+               for nextstg in line:
+                   if (first):        
+                       linestg = nextstg
+                       first=False
+                   else:
+                       linestg += ',' + nextstg
+                   #linestg += nextstg
+               self.LogText.insert(END, linestg+'\n')
+               fileData+=linestg+'\n'
            
            filename = asksaveasfilename(initialdir = "./",
                       title = "Save user.csv file...",
@@ -213,14 +223,9 @@ class guiDMRUtils(Frame):
                       filetypes = [("csv files","*.csv"),
                                    ("text files","*.txt"),
                                    ("all files","*.*")])
-           name = open(filename, 'wb')
-           name.write(self.usercsvData)
+           name = open(filename, 'w')
+           name.writelines(fileData)
            name.close()
-           self.userfilename = os.path.dirname(filename) + \
-                                '/user.csv'
-           self.usercsvData = None
-           self.usercsvData = app.readFile(filename) 
-           print (self.usercsvData)
            self.filemenu.entryconfigure("Convert to AnyTone...", state="normal")
            self.filemenu.entryconfigure("Convert to CS800D...", state="normal")
        pass
