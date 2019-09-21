@@ -1,8 +1,7 @@
-#!/bin/python
+#!/usr/bin/env python
 from sys import stdin, stdout
 import csv
 import os, sys
-import argparse
 import traceback
 from datetime import datetime
 python_version = sys.version_info[0]
@@ -122,7 +121,7 @@ class DMRUtils():
             target_data.append(newline)
             linecount += 1
         return target_data    
-        
+       
     def dmrMain(self, filename):
         data = self.readFile(filename)
  
@@ -131,36 +130,9 @@ class DMRUtils():
         resultfile = self.autowriteFile(new_data, filename)
                                         
                                         
-          
-
-"""
-Aurgument Parser Class
-This may need to be modified for each individual type.
-"""
-class get_args():
-    def __init__(self):
-        self.args = self.getargs()
-
-    def __get_app_version__(self):
-        TEMP = DMRUtils()
-        return TEMP.__version__()
-            
-    def getargs(self):
-        version = self.__get_app_version__()
-        parser = argparse.ArgumentParser(
-            description = 'Convert RADIOID.NET user.csv file to ' + \
-                          'Anytone AT-8x8 UV Format.',
-            epilog = 'This class is normally inherited by another '+ \
-                     'for a specific radio or family of radios.')
-        parser.add_argument('-v', '--version', action='version', version = version)
-        parser.add_argument("-i", "--inputpath", default=None,
-            help="Specifies the path to the DMR ID file in .csv format.")
-        return parser.parse_args()
-
-
 """
 Main program - run stand-alone if not included as part of a larger application
 """
 if __name__ == '__main__':
-   args = get_args()
-   app = DMRUtils(args.args.inputpath.strip())
+   app = DMRUtils()
+   print ('VERSION: %s'%(app.__version__()))

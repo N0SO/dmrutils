@@ -1,5 +1,7 @@
 #!/usr/bin/env python
-import argparse
+import sys, argparse
+
+VERSION = '0.0.1B'
 
 """
 Aurgument Parser Class
@@ -10,20 +12,41 @@ class get_args():
         self.args = self.getargs()
 
     def __get_app_version__(self):
+        versions = 'dmrcontacts V'+VERSION+'\n' 
+        #nextver = ['dmrcontacts', VERSION] 
+        #versions.append(nextver)
         from dmrutils import DMRUtils
         TEMP = DMRUtils()
-        return TEMP.__version__()
+        #nextver=['dmrutils', TEMP.__version__()]
+        #versions.append(nextver)  
+        versions+='dmrutils V'+TEMP.__version__()+'\n'
+        from user2anytone import User2Anytone
+        TEMP = User2Anytone()
+        versions+='user2anytone V'+TEMP.__version__()+'\n'
+        from user2cs800d import User2CS800D
+        TEMP = User2CS800D()
+        versions+='user2cs800d V'+TEMP.__version__()+'\n'
+        from ui import guiDMRUtils
+        TEMP = guiDMRUtils(start=False)
+        versions+='ui V'+TEMP.__version__()+'\n'
+        return versions
             
     def getargs(self):
         version = self.__get_app_version__()
         parser = argparse.ArgumentParser(
             description = 'Convert RADIOID.NET user.csv file to ' + \
-                          'Anytone AT-8x8 UV Format.',
-            epilog = 'This class is normally inherited by another '+ \
-                     'for a specific radio or family of radios.')
+                          'Format required by <rtype>.',
+            epilog = 'Output file will be in the same ' + \
+                     'location as the source with ' + \
+                     '-<RADIO TYPE>-YYYYMMDD-HHMMSS embedded ' + \
+                     'in the file name.')
         parser.add_argument('-v', '--version', action='version', version = version)
         parser.add_argument("-i", "--inputpath", default=None,
             help="Specifies the path to the DMR ID file in .csv format.")
+        parser.add_argument("-r", "--rtype", default='AT878', 
+            help="Specifies the radio type to convert to: " + \
+                 "AT878 = Anytone AT-878 (default), " +\
+                 "CS800D = Connect Systems CS-800D.")
         return parser.parse_args()
 
 
@@ -33,8 +56,15 @@ Main program - run stand-alone if not included as part of a larger application
 if __name__ == '__main__':
     args = get_args()
     if (args.args.inputpath):
-       from dmrutils import DMRUtils       
-       app = DMRUtils(args.args.inputpath.strip())
+       rtype = args.args.rtype.upper()
+       if (rtype == 'AT878'):
+           from user2anytone import User2Anytone as dmrclass     
+       elif (rtype =='CS800D'): 
+           from user2cs800d import User2CS800D as dmrclass 
+       else:
+            sys.exit('Unknown radio type: %s'%(rtype))     
+       app = dmrclass(args.args.inputpath.strip())
+
     else:
-       from gui_dmrutils import guiDMRUtils
+       from ui import guiDMRUtils
        app = guiDMRUtils() 
