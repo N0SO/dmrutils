@@ -91,20 +91,25 @@ class DMRUtils():
         try:
             print("reading data from %s..."%(url))
             r1 = requests.get(url) 
+            r1.encoding = 'utf-8'
             print ("URL read status: %d"%(r1.status_code))
             rawdata = r1.text
+            #print('rawdata = \n%s'%(rawdata))
             print("... done!")
         except:
             tb = traceback.format_exc()
             print("Error fetching %s"%(url))
             print("traceback:\n%s"%(tb))
         linestg = rawdata.splitlines()
+        print ('Creating retdata...')
         for line in linestg:
             nextline = []
             lineparts = line.split(',')
             for nextpart in lineparts:
                 nextline.append(nextpart)
             retdata.append(nextline)
+            #print (retdata)
+        print('...done!')
         return retdata
  
     def processData(self, source_data):
@@ -140,3 +145,4 @@ Main program - run stand-alone if not included as part of a larger application
 if __name__ == '__main__':
    app = DMRUtils()
    print ('VERSION: %s'%(app.__version__()))
+

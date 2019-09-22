@@ -24,16 +24,7 @@ else:
     from tkinter.filedialog import askopenfilename
     from tkinter.filedialog import askdirectory
     from tkinter.filedialog import asksaveasfilename
-"""
-try:
-    from Tkinter import *
-except ImportError:
-    from tkinter import *
-from tkMessageBox import *
-from tkFileDialog   import askopenfilename
-from tkFileDialog   import askdirectory
-from tkFileDialog   import asksaveasfilename
-"""
+
 from datetime import datetime
 from user2anytone import User2Anytone
 from user2cs800d import User2CS800D
@@ -195,16 +186,18 @@ class guiDMRUtils(Frame):
        """
        print('Fetching latest user.csv file from %s'%(URL))
        app = User2Anytone()
-       self.usercsvData = app.fetchIDList(URL)
+       IDData = app.fetchIDList(URL)
        #print('Fetched data = \n%s'%(self.usercsvData))         
-       if (self.usercsvData):
+       if (IDData):
+           print ('IDData type is %s'%(type(IDData)))
            self.userfilename = 'user.csv'
            datestg = datetime.now().strftime('%Y%m%d-%H%M%S')
            newfilename = 'user-' + datestg  +'.csv'
            self.LogText.delete(1.0, END)
-           
+           print('Writing data to text window...')
            fileData = ''
-           for line in self.usercsvData:
+           loops = 0
+           for line in IDData:
                #linestg = ''
                first = True
                for nextstg in line:
@@ -214,9 +207,14 @@ class guiDMRUtils(Frame):
                    else:
                        linestg += ',' + nextstg
                    #linestg += nextstg
-               self.LogText.insert(END, linestg+'\n')
+               #print ('Inserting...')
+               #self.LogText.insert(END, linestg+'\n')
                fileData+=linestg+'\n'
-           
+               #print('...done inserting!')
+               loops += 1
+           self.LogText.insert(END, fileData)
+           print('Done!\nWriting data to file...%d loops completed.'%(loops))
+    
            filename = asksaveasfilename(initialdir = "./",
                       title = "Save user.csv file...",
                       initialfile = newfilename,
@@ -226,6 +224,9 @@ class guiDMRUtils(Frame):
            name = open(filename, 'w')
            name.writelines(fileData)
            name.close()
+           print('Done!')
+           self.usercsvData=None
+           self.usercsvData = app.readFile(filename)
            self.filemenu.entryconfigure("Convert to AnyTone...", state="normal")
            self.filemenu.entryconfigure("Convert to CS800D...", state="normal")
        pass
