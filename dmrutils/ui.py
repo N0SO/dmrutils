@@ -8,6 +8,14 @@ Update History:
 * Thu Aug 29 2019 Mike Heitmann, N0SO <n0so@arrl.net>
 - V0.1.0 - Fuctional enough for first use! Converts to 
 - AnyTone 868/878 and Connect Systems CS-800D
+* Tue Sep 24 2019 Mike Heitmann, N0SO <n0so@arrl.net>
+- V1.0.2 - Lots of changes!
+- Changed name to ui.py and added to module dmrutils
+- Support for py3
+- Added method to call fetchIDList in dmrutils to get
+- DMR ID list from RADIOID.NET directly.
+- Changed version reporting to show version of all
+- classes and the PY version.
 
 """
 import sys
@@ -31,7 +39,7 @@ from user2cs800d import User2CS800D
 
 import os.path
 
-VERSION = '1.0.1'
+VERSION = '1.0.2'
 FILELIST = './'
 RADIOIDURL = 'https://www.radioid.net/static/user.csv'
 
@@ -44,6 +52,23 @@ class guiDMRUtils(Frame):
 
     def __version__(self):
         return VERSION
+        
+    def __get_app_version__(self):
+        versions = 'dmrcontacts V'+VERSION+'\n' 
+        from dmrutils import DMRUtils
+        TEMP = DMRUtils()
+        versions+='dmrutils V'+TEMP.__version__()+'\n'
+        from user2anytone import User2Anytone
+        TEMP = User2Anytone()
+        versions+='user2anytone V'+TEMP.__version__()+'\n'
+        from user2cs800d import User2CS800D
+        TEMP = User2CS800D()
+        versions+='user2cs800d V'+TEMP.__version__()+'\n'
+        from ui import guiDMRUtils
+        TEMP = guiDMRUtils(start=False)
+        versions+='ui V'+TEMP.__version__()+'\n'
+        return versions
+
 
     #Creation of init_window
     def client_exit(self):
@@ -152,6 +177,7 @@ class guiDMRUtils(Frame):
         infotext = \
         'DMRCONTACTS - Version ' + VERSION + '\n' + \
         'Utilities to help manage DMR Contact Lists in CSV format.\n' \
+        + self.__get_app_version__() + '\n' \
         + 'Python ' + pythonversion[0]
         showinfo('DMRCONTACTS', infotext)
 
@@ -221,10 +247,13 @@ class guiDMRUtils(Frame):
                       filetypes = [("csv files","*.csv"),
                                    ("text files","*.txt"),
                                    ("all files","*.*")])
-           name = open(filename, 'w')
-           name.writelines(fileData)
-           name.close()
+           #name = open(filename, 'w')
+           with open(filename,'r') as name:
+               name.writelines(fileData)
+           #name.close()
            print('Done!')
+           self.userfilename = os.path.dirname(filename) + \
+                                                  '/user.csv'
            self.usercsvData=None
            self.usercsvData = app.readFile(filename)
            self.filemenu.entryconfigure("Convert to AnyTone...", state="normal")
