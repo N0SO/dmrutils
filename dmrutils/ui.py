@@ -16,7 +16,10 @@ Update History:
 - DMR ID list from RADIOID.NET directly.
 - Changed version reporting to show version of all
 - classes and the PY version.
-
+* Tue Sep 27 2019 Mike Heitmann, N0SO <n0so@arrl.net>
+- V1.0.3
+- A few bug fixes
+- Additions to the HELP menu: Usage instructions
 """
 import sys
 python_version = sys.version_info[0]
@@ -39,7 +42,7 @@ from user2cs800d import User2CS800D
 
 import os.path
 
-VERSION = '1.0.2'
+VERSION = '1.0.3'
 FILELIST = './'
 RADIOIDURL = 'https://www.radioid.net/static/user.csv'
 
@@ -54,7 +57,8 @@ class guiDMRUtils(Frame):
         return VERSION
         
     def __get_app_version__(self):
-        versions = 'dmrcontacts V'+VERSION+'\n' 
+        from __init__ import VERSION as DMVER
+        versions = 'dmrcontacts V'+DMVER+'\n' 
         from dmrutils import DMRUtils
         TEMP = DMRUtils()
         versions+='dmrutils V'+TEMP.__version__()+'\n'
@@ -112,6 +116,10 @@ class guiDMRUtils(Frame):
         menu.add_cascade(label="Help", menu=helpmenu)
         helpmenu.add_command(label='AnyTone AT-8x8UV Support',
                              command=self.displayanytone)
+        helpmenu.add_command(label='ConnectSystems CS-800D Support',
+                             command=self.displaycs800d)
+        helpmenu.add_command(label='Usage Instructions',
+                             command=self.showInstructions)
         helpmenu.add_command(label="About...", command=self.About)
 
         #mainloop()
@@ -174,6 +182,7 @@ class guiDMRUtils(Frame):
     def About(self):
         print ('About...')
         pythonversion = sys.version.splitlines()
+        from __init__ import VERSION
         infotext = \
         'DMRCONTACTS - Version ' + VERSION + '\n' + \
         'Utilities to help manage DMR Contact Lists in CSV format.\n' \
@@ -181,16 +190,38 @@ class guiDMRUtils(Frame):
         + 'Python ' + pythonversion[0]
         showinfo('DMRCONTACTS', infotext)
 
+    def displaycs800d(self):
+         infotext =  \
+         'Connect Systems CS-800D Support - '  +  \
+         'Convert RADIO ID user.csv file to the format required ' +  \
+         'by the CS-800D.'
+         showinfo( 'Connect Systems CS-800D Support', infotext)
 
 
     def displayanytone(self):
-        showinfo('AnyTone AT-868/878UV Support', \
-                 'Convert user.csv file to the format required\n'+ \
-                 'by the AnyTone AT-868UV and AT-878UV.')
+        infotext = \
+        'AnyTone AT-868/878UV Support - ' + \
+        'Convert user.csv file to the format required ' + \
+        'by the AnyTone AT-868UV and AT-878UV.'
+        showinfo( 'AnyTone AT-868/878UV Support', infotext )
 
+    def showInstructions(self):
+        infotext = \
+"""
+Usage Instructions:
+1. Getthe lastest user.csv file from RADIOID.NET.
+    A. Download it from RADIOID.NET using a web browser.
+    B. Use the Fetch Latest ID List... to get the latest list. You will be prompted to SAVE the file.
+2. Load the new USER.CSV list using the Browse for ID List File... - If option 1B was used, no need for this step.  
+3. Wait for the window to fill with the new USER.CSV data.
+4. After the window fills with new USER ID data, the Convert To... options on the file menu will be selectable.
+5. Select the appropriate Convert To... option on the file menu. 
+6. On completion, an info message with the path to the converted file will be displayed.
+"""
+        showinfo('Usaage Instructions', infotext)
         
     def fillLogTextfromData(self, Data, textWindow, clearWin = False):
-        if (clearWin):
+        if (clearWin): 
             textWindow.delete(1.0, END)
         for line in Data:
             textWindow.insert(END, line.strip()+'\n')
@@ -248,7 +279,7 @@ class guiDMRUtils(Frame):
                                    ("text files","*.txt"),
                                    ("all files","*.*")])
            #name = open(filename, 'w')
-           with open(filename,'r') as name:
+           with open(filename,'w') as name:
                name.writelines(fileData)
            #name.close()
            print('Done!')
