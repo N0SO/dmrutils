@@ -20,8 +20,17 @@ DMRUtils - A collection of methods good for manipulating
            downloaded from https://radioid.net/database/dumps#!
            and converts the file to the format required to
            import into the Anytone 868 and 878 handhelds.
+Update History:
+* Wed Sep 08 Mike Heitmann, N0SO <n0so@arrl.net>
+- V1.0.8 - First interation
+- Fixed a crash that occcured when converting the USR.CSV file
+- from radioid.net - the source no longer contains a REMARKS
+- field. 
+- Improved error handling for failure to download the USR.CSV
+- file. The error message will be trapped and displayed in the
+- main window.
 """
-DMRUTILS_VERS = '1.0.7'
+DMRUTILS_VERS = '1.0.8'
 RADIOTYPE = 'AnyTone'
 ANYTONE878fieldnames = ['No.','Radio ID', \
                         'Callsign', 'Name', \
@@ -98,8 +107,9 @@ class DMRUtils():
             print("... done!")
         except:
             tb = traceback.format_exc()
-            print("Error fetching %s"%(url))
-            print("traceback:\n%s"%(tb))
+            #Load error message instead of data
+            rawdata = 'Error fetching %s\n\nError traceback:\n%s'%(url,tb)
+            print(rawdata)
         linestg = rawdata.splitlines()
         print ('Creating retdata...')
         for line in linestg:
@@ -116,6 +126,7 @@ class DMRUtils():
         target_data = []
         linecount = 1
         for line in source_data:
+            #print(line)
             newline = dict({'No.': linecount, \
                        'Radio ID':line['RADIO_ID'], \
                        'Callsign':line['CALLSIGN'], \
@@ -124,7 +135,7 @@ class DMRUtils():
                        'City': line['CITY'], \
                        'State': line['STATE'], \
                        'Country': line['COUNTRY'], \
-                       'Remarks': line['REMARKS'], \
+                       #'Remarks': line['REMARKS'], \
                        'Call Type': 'Private Call', \
                        'Call Alert': 'None'})
             target_data.append(newline)
